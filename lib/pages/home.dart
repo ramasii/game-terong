@@ -43,23 +43,22 @@ class _HomePageState extends State<HomePage> {
 
   Widget TerongButton() {
     return Container(
-      constraints:
-          BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 3),
-      child: IconButton(
-            iconSize: 250,
-            onPressed: () {
-              setState(() {
-                AddTerong(1);
-              });
-            },
-            splashColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            icon: Image.asset(
-              "assets/images/terong bersih.png",
-              width: MediaQuery.of(context).size.width / 2,
-            ),
-          )
-    );
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 3),
+        child: IconButton(
+          iconSize: 250,
+          onPressed: () {
+            setState(() {
+              AddTerong(1);
+            });
+          },
+          splashColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          icon: Image.asset(
+            "assets/images/terong bersih.png",
+            width: MediaQuery.of(context).size.width / 2,
+          ),
+        ));
   }
 }
