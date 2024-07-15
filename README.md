@@ -2,6 +2,17 @@
 
 GT, T nya terong.
 
+### Inspirasi
+- temen" sg sering ngomong terang terong kasih reaksi terong terong terong
+- game Banana ([Steam](https://store.steampowered.com/app/2923300/Banana))
+
+### Github game terong (Android & Windows)
+- [Release page](https://github.com/ramasii/game-terong/releases)
+
+### Framework (bukan game engine)
+- cuma Flutter
+
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
