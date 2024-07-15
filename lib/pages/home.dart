@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:gameterong/packages.dart';
+import '../classes/terong.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -12,7 +13,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int terongCount = 0;
+  Terong terong = Terong();
+
+  @override
+  void initState() {
+    super.initState();
+    SetupTerong();
+  }
+
+  Future SetupTerong() async {
+    await terong.ReadTerong();
+    setState(() {
+      log("Setup Terong");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +38,13 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              '$terongCount',
-              style: TextStyle(
-                  color: Color.fromARGB(255, 242, 229, 255), fontSize: 50),
+            FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                '${terong.count}',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 238, 221, 255), fontSize: 50),
+              ),
             ),
             TerongButton(),
           ],
@@ -37,19 +54,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   // func
-  void AddTerong(int amount) {
-    terongCount += amount;
-  }
-
   Widget TerongButton() {
     return Container(
         constraints:
             BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 3),
         child: IconButton(
           iconSize: 250,
-          onPressed: () {
+          onPressed: () async {
             setState(() {
-              AddTerong(1);
+              terong.AddTerong(1);
+              terong.WriteTerong();
             });
           },
           splashColor: Colors.transparent,
