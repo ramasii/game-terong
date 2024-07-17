@@ -1,4 +1,5 @@
 # Miscellaneous
+firebase_options.dart
 google-services.json
 *.class
 *.log
