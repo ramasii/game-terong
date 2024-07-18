@@ -1,27 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:developer';
+import 'package:tame_terong/classes/user_account.dart';
 import 'package:tame_terong/pages/error.dart';
-import 'pages.dart';
+import 'package:tame_terong/pages/home.dart';
 
-class LoadingPage extends StatelessWidget {
-  const LoadingPage({super.key, required this.loadingTitle});
+class LoadingPage extends StatefulWidget {
+  const LoadingPage({super.key, this.loadingTitle = "Loading..."});
 
   final String loadingTitle;
 
   @override
-  Widget build(BuildContext context) {
-    final Future<FirebaseApp> initialization = Firebase.initializeApp();
+  State<LoadingPage> createState() => _LoadingPageState();
+}
 
-    return MaterialApp(
-      title: loadingTitle,
-      home: FutureBuilder(
-        future: initialization,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return const HomePage(title: "Game Terong");
-          }
-          return const ErrorPage();
-        },
+class _LoadingPageState extends State<LoadingPage> {
+  String message = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    UserSetup();
+  }
+
+  Future<void> UserSetup() async {
+    Map? account = await UserAccount().loadSavedAccount();
+
+    account != null
+        ? message = "Welkam ${account['username']}!!"
+        : log("tingtung");
+
+    await Future.delayed(Duration(seconds: 1), () {
+      if (account != null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const HomePage()));
+      } else {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ErrorPage(
+                      message: "account not found",
+                    )));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text(widget.loadingTitle), Text(message)],
+        ),
       ),
     );
   }

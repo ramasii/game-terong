@@ -16,13 +16,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance);
+    FirebaseAnalyticsObserver observer =
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: GameTerongTheme(),
-      // home: const LoadingPage(loadingTitle: "Firebase Initialization"),
       navigatorObservers: [observer],
+      // home: const LoadingPage(loadingTitle: "Firebase Initialization"),
       home: const HomePage(title: "Game Terong"),
     );
   }
@@ -37,10 +38,10 @@ class MyApp extends StatelessWidget {
         onSecondary: Color(0xFFFFFFFF),
         error: Color(0xFFB00020),
         onError: Color(0xFFFFFFFF),
-        surface: Color(0xFFEAD2FA),
-        onSurface: Color(0xFF000000),
+        onSurface: Color(0xFFEAD2FA),
+        surface: Color.fromARGB(255, 37, 0, 48),
       ),
-      scaffoldBackgroundColor: const Color.fromARGB(255, 37, 0, 48),
+      // scaffoldBackgroundColor: Color.fromARGB(255, 37, 0, 48),
       appBarTheme: const AppBarTheme(
           color: Colors.transparent, elevation: 0, centerTitle: true),
       splashColor: Colors.transparent,

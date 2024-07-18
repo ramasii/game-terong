@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tame_terong/classes/terong_pixel.dart';
 import 'package:tame_terong/packages.dart';
-// import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:tame_terong/pages/profile_page.dart';
 import '../classes/terong.dart';
+import 'pages.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key, this.title = "Game Terong"});
 
   final String title;
 
@@ -18,10 +20,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Terong terong = Terong();
+  TerongPixel terongPixel = TerongPixel();
 
   // anonym auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? _user;
+  User? user;
 
   // analytic
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
@@ -31,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     SetupTerong();
-    _signInAnonymously();
+    // _signInAnonymously();
     SetupAnalytics();
   }
 
@@ -41,6 +44,8 @@ class _HomePageState extends State<HomePage> {
 
   Future SetupTerong() async {
     await terong.ReadTerong();
+    await terongPixel.Load();
+
     setState(() {
       log("Setup Terong");
     });
@@ -49,9 +54,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
+      appBar: HomeAppBar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -71,6 +74,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  AppBar HomeAppBar() {
+    return AppBar(
+      // title: Text(widget.title),
+      backgroundColor: Colors.transparent,
+      actions: [ProfileButton()],
+    );
+  }
+
+  IconButton ProfileButton() {
+    return IconButton(
+      onPressed: () {
+        // go to akun page
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => ProfilePage()));
+      },
+      icon: Icon(Icons.person),
+      tooltip: "Profil",
+    );
+  }
+
   // func
   Widget TerongButton() {
     return Container(
@@ -84,11 +107,8 @@ class _HomePageState extends State<HomePage> {
               terong.WriteTerong();
             });
 
-            // await FirestoreService().addUser("usnm", "pass");
-
-            await analytics.logEvent(
-                name: "seratus_terong",
-                parameters: {"terongCount": terong.count});
+            CheckThenGetTerong();
+            await CheckThenSendEvent();
           },
           splashColor: Colors.transparent,
           hoverColor: Colors.transparent,
@@ -100,33 +120,58 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
+  Future<void> CheckThenSendEvent() async {
+    // kirim event
+    if (terong.count == 100) {
+      await analytics.logEvent(
+          name: "seratus_terong", parameters: {"terongCount": terong.count});
+    }
+  }
+
+  CheckThenGetTerong() {
+    // cek waktu
+    DateTime dateTime = DateTime.now();
+
+    // jika (jam < 12 atau jam >= 11) dan terong kelipatan 1000
+    // maka dapatkan terong pixel
+    if ((dateTime.hour < 12 || dateTime.hour >= 11) &&
+        (terong.count % 1000 == 0)) {
+      // beri terong pixel
+      terongPixel.Add(1);
+      terongPixel.Save();
+
+      // dialog selamat
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Selamat!"),
+              content: Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Kamu mendapatkan Terong Pixel 😋🍆"),
+                    Divider(
+                      color: Colors.transparent,
+                    ),
+                    Image.asset("assets/images/terong pixel.png")
+                  ],
+                ),
+              ),
+            );
+          });
+    }
+  }
+
   Future<void> _signInAnonymously() async {
     try {
       UserCredential userCredential = await _auth.signInAnonymously();
       setState(() {
-        _user = userCredential.user;
+        user = userCredential.user;
       });
       print("Signed in with temporary account.");
     } catch (e) {
       print("Failed to sign in anonymously: $e");
-    }
-  }
-}
-
-class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<void> addUser(String username, String pass) async {
-    try {
-      await _firestore.collection('user_accounts').doc(username).set({
-        'username': username,
-        'password': pass,
-        'date_created': FieldValue.serverTimestamp(),
-        'date_edited': FieldValue.serverTimestamp(),
-      });
-      print('User added successfully');
-    } catch (e) {
-      print('Error adding user: $e');
     }
   }
 }
