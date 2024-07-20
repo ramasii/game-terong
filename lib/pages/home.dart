@@ -3,11 +3,10 @@ import 'dart:developer';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tame_terong/classes/terong_pixel.dart';
+import 'package:tame_terong/classes/terong_manager.dart';
+import 'package:tame_terong/classes/terong_v2.dart';
 import 'package:tame_terong/packages.dart';
 import 'package:tame_terong/pages/profile_page.dart';
-import '../classes/terong.dart';
-import 'pages.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.title = "Game Terong"});
@@ -19,8 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Terong terong = Terong();
-  TerongPixel terongPixel = TerongPixel();
+  TerongManager terongManager = TerongManager();
 
   // anonym auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -43,8 +41,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future SetupTerong() async {
-    await terong.ReadTerong();
-    await terongPixel.Load();
+    await terongManager.LoadAllTerong();
 
     setState(() {
       log("Setup Terong");
@@ -62,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             FittedBox(
               fit: BoxFit.contain,
               child: Text(
-                '${terong.count}',
+                '${terongManager.terongList[0].count}',
                 style: const TextStyle(
                     color: Color.fromARGB(255, 238, 221, 255), fontSize: 50),
               ),
@@ -102,13 +99,15 @@ class _HomePageState extends State<HomePage> {
         child: IconButton(
           iconSize: 250,
           onPressed: () async {
+            TerongV2 terong = terongManager.terongList[0];
             setState(() {
-              terong.AddTerong(1);
-              terong.WriteTerong();
+              terong.Add(1);
+              terong.Save();
             });
 
-            CheckThenGetTerong();
             await CheckThenSendEvent();
+
+            await CheckThenGetTerong();
           },
           splashColor: Colors.transparent,
           hoverColor: Colors.transparent,
@@ -121,45 +120,55 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> CheckThenSendEvent() async {
+    // declare
+    TerongV2 terongV2 = terongManager.terongList[0];
     // kirim event
-    if (terong.count == 100) {
+    if (terongV2.count == 100) {
       await analytics.logEvent(
-          name: "seratus_terong", parameters: {"terongCount": terong.count});
+          name: "seratus_terong", parameters: {"terongCount": terongV2.count});
     }
   }
 
-  CheckThenGetTerong() {
-    // cek waktu
+  CheckThenGetTerong() async {
+    // declare
     DateTime dateTime = DateTime.now();
+    TerongV2 terongBiasa = terongManager.terongList[0];
 
-    // jika (jam < 12 atau jam >= 11) dan terong kelipatan 1000
-    // maka dapatkan terong pixel
-    if ((dateTime.hour < 12 || dateTime.hour >= 11) &&
-        (terong.count % 1000 == 0)) {
-      // beri terong pixel
-      terongPixel.Add(1);
-      terongPixel.Save();
+    // check V2
+    for (var terong in terongManager.terongList) {
+      if (terong.id != "terong" &&
+          terong.timeSpawnEnd != null &&
+          terong.timeSpawnStart != null) {
+        if ((dateTime.hour < terong.timeSpawnEnd! ||
+                dateTime.hour >= terong.timeSpawnStart!) &&
+            (terongBiasa.count % terong.probability == 0)) {
+          terong.Add(1);
+          terong.Save();
 
-      // dialog selamat
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("Selamat!"),
-              content: Container(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text("Kamu mendapatkan Terong Pixel 😋🍆"),
-                    Divider(
-                      color: Colors.transparent,
-                    ),
-                    Image.asset("assets/images/terong pixel.png")
-                  ],
-                ),
-              ),
-            );
-          });
+          // dialog selamat
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Selamat!"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Kamu mendapatkan ${terong.name} 😋🍆"),
+                      const Divider(
+                        color: Colors.transparent,
+                      ),
+                      Image.asset("assets/images/${terong.img}"),
+                      const Divider(
+                        color: Colors.transparent,
+                      ),
+                      Text("By: ${terong.creator}")
+                    ],
+                  ),
+                );
+              });
+        }
+      }
     }
   }
 

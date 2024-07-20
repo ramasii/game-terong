@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:tame_terong/pages/pages.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -34,44 +35,48 @@ class _ProfilePageState extends State<ProfilePage> {
           const Divider(
             color: Colors.transparent,
           ),
-          Card(
-            color: Color.fromARGB(255, 57, 5, 103),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5))),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // terong drop
-                ListTile(
-                  onTap: () {
-                    log("Terong drop");
-                  },
-                  leading: Text(
-                    "💦",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  title: Text("Terong drop"),
-                  subtitle: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text("Kapan kemunculan jenis terong lain?")),
-                  trailing: Icon(Icons.chevron_right),
-                ),
-                // kata deve
-                ListTile(
-                  onTap: () {
-                    log("Kata developernya");
-                  },
-                  leading: Text(
-                    "💌",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  title: Text("Kata developernya"),
-                  subtitle: Text("Jadi gini bang..."),
-                  trailing: Icon(Icons.chevron_right),
-                ),
-              ],
+          SecondMenuCard()
+        ],
+      ),
+    );
+  }
+
+  Card SecondMenuCard() {
+    return Card(
+      color: Color.fromARGB(255, 57, 5, 103),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5))),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // terong drop
+          ListTile(
+            onTap: () {
+              log("Terong drop");
+            },
+            leading: Text(
+              "💦",
+              style: TextStyle(fontSize: 20),
             ),
-          )
+            title: Text("Terong drop"),
+            subtitle: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Text("Kapan kemunculan jenis terong lain?")),
+            trailing: Icon(Icons.chevron_right),
+          ),
+          // kata deve
+          ListTile(
+            onTap: () {
+              log("Kata developernya");
+            },
+            leading: Text(
+              "💌",
+              style: TextStyle(fontSize: 20),
+            ),
+            title: Text("Kata developernya"),
+            subtitle: Text("Jadi gini bang..."),
+            trailing: Icon(Icons.chevron_right),
+          ),
         ],
       ),
     );
@@ -92,6 +97,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ListTile(
               onTap: () {
                 log("Terongku");
+
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => TerongkuPage()));
               },
               leading: Text(
                 "🍆",
