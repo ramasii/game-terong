@@ -1,10 +1,16 @@
 import 'dart:developer';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import '../classes/terong.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tame_terong/classes/terong_manager.dart';
+import 'package:tame_terong/classes/terong_v2.dart';
+import 'package:tame_terong/classes/user_clicks.dart';
+import 'package:tame_terong/packages.dart';
+import 'package:tame_terong/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key, this.title = "Game Terong"});
 
   final String title;
 
@@ -13,16 +19,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Terong terong = Terong();
+  TerongManager terongManager = TerongManager();
+  UserClicks userClicks = UserClicks();
+
+  // anonym auth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? user;
+
+  // analytic
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   @override
   void initState() {
     super.initState();
+
     SetupTerong();
+    SetupAnalytics();
+  }
+
+  Future SetupAnalytics() async {
+    await analytics.setAnalyticsCollectionEnabled(true);
   }
 
   Future SetupTerong() async {
-    await terong.ReadTerong();
+    await terongManager.LoadAllTerong();
+    await userClicks.Load();
+
     setState(() {
       log("Setup Terong");
     });
@@ -31,9 +53,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
+      appBar: HomeAppBar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -41,8 +61,8 @@ class _HomePageState extends State<HomePage> {
             FittedBox(
               fit: BoxFit.contain,
               child: Text(
-                '${terong.count}',
-                style: TextStyle(
+                '${terongManager.terongList[0].count}',
+                style: const TextStyle(
                     color: Color.fromARGB(255, 238, 221, 255), fontSize: 50),
               ),
             ),
@@ -50,6 +70,26 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  AppBar HomeAppBar() {
+    return AppBar(
+      // title: Text(widget.title),
+      backgroundColor: Colors.transparent,
+      actions: [ProfileButton()],
+    );
+  }
+
+  IconButton ProfileButton() {
+    return IconButton(
+      onPressed: () {
+        // go to akun page
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const ProfilePage()));
+      },
+      icon: const Icon(Icons.person),
+      tooltip: "Profil",
     );
   }
 
@@ -61,10 +101,18 @@ class _HomePageState extends State<HomePage> {
         child: IconButton(
           iconSize: 250,
           onPressed: () async {
+            TerongV2 terong = terongManager.terongList[0];
+            userClicks.count++;
+            userClicks.Save();
+
             setState(() {
-              terong.AddTerong(1);
-              terong.WriteTerong();
+              terong.Add(1);
+              terong.Save();
             });
+
+            await CheckThenSendEvent();
+
+            await CheckThenGetTerong();
           },
           splashColor: Colors.transparent,
           hoverColor: Colors.transparent,
@@ -74,5 +122,73 @@ class _HomePageState extends State<HomePage> {
             width: MediaQuery.of(context).size.width / 2,
           ),
         ));
+  }
+
+  Future<void> CheckThenSendEvent() async {
+    // declare
+    TerongV2 terongV2 = terongManager.terongList[0];
+    // kirim event
+    if (terongV2.count == 100) {
+      await analytics.logEvent(
+          name: "seratus_terong", parameters: {"terongCount": terongV2.count});
+    }
+  }
+
+  CheckThenGetTerong() async {
+    // declare
+    DateTime dateTime = DateTime.now();
+
+    // check V2
+    // cek untuk setiap terong di list
+    for (var terong in terongManager.terongList) {
+      // jika bukan terong biasa dan bukan terong yg muncul 24 jam
+      if (terong.id != "terong" &&
+          terong.timeSpawnEnd != null &&
+          terong.timeSpawnStart != null) {
+        // jika waktu sekarang di antara kemunculan terong tsb
+        // dan klik pengguna = kelipatannya probabilitas terong
+        if ((dateTime.hour < terong.timeSpawnEnd! &&
+                dateTime.hour >= terong.timeSpawnStart!) &&
+            (userClicks.count % terong.probability == 0)) {
+          terong.Add(1);
+          terong.Save();
+
+          // dialog selamat
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Selamat!"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Kamu mendapatkan ${terong.name} 😋🍆"),
+                      const Divider(
+                        color: Colors.transparent,
+                      ),
+                      Image.asset("assets/images/${terong.img}"),
+                      const Divider(
+                        color: Colors.transparent,
+                      ),
+                      Text("By: ${terong.creator}")
+                    ],
+                  ),
+                );
+              });
+        }
+      }
+    }
+  }
+
+  Future<void> _signInAnonymously() async {
+    try {
+      UserCredential userCredential = await _auth.signInAnonymously();
+      setState(() {
+        user = userCredential.user;
+      });
+      print("Signed in with temporary account.");
+    } catch (e) {
+      print("Failed to sign in anonymously: $e");
+    }
   }
 }
