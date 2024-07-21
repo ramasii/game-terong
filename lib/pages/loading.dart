@@ -30,7 +30,7 @@ class _LoadingPageState extends State<LoadingPage> {
         ? message = "Welkam ${account['username']}!!"
         : log("tingtung");
 
-    await Future.delayed(Duration(seconds: 1), () {
+    await Future.delayed(const Duration(seconds: 1), () {
       if (account != null) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (_) => const HomePage()));

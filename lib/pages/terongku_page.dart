@@ -38,14 +38,14 @@ class _TerongkuPageState extends State<TerongkuPage> {
 
   ListView TerongkuBody() {
     return ListView.builder(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         itemCount: terongManager.terongList.length,
         itemBuilder: (context, index) {
           TerongV2 terong = terongManager.terongList[index];
           return Card(
-            color: Color.fromARGB(255, 67, 1, 133),
+            color: const Color.fromARGB(255, 67, 1, 133),
             child: ListTile(
-              contentPadding: EdgeInsets.all(10),
+              contentPadding: const EdgeInsets.all(10),
               onTap: () {
                 log("tap ${terong.name}");
               },
@@ -53,13 +53,13 @@ class _TerongkuPageState extends State<TerongkuPage> {
               title: Text(terong.name),
               subtitle: Text("By ${terong.creator}"),
               trailing: Container(
-                constraints: BoxConstraints(maxWidth: 150),
+                constraints: const BoxConstraints(maxWidth: 150),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Text(
                     formatNumber(terong.count),
                     // terong.count.toString(),
-                    style: TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20),
                   ),
                 ),
               ),

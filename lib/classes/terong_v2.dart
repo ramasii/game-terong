@@ -5,9 +5,9 @@ class TerongV2 {
   final String name;
   final String description;
   final String creator;
-  int count = 0;
+  int count;
   String img;
-  int probability = 1;
+  int probability;
   int? timeSpawnStart, timeSpawnEnd;
 
   TerongV2(
@@ -15,11 +15,11 @@ class TerongV2 {
       required this.name,
       required this.description,
       required this.creator,
-      count,
+      this.count = 0,
       required this.img,
-      probability,
-      timeSpawnStart,
-      timeSpawnEnd});
+      this.probability = 1,
+      this.timeSpawnStart,
+      this.timeSpawnEnd});
 
   // func
   Map toMap() {

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tame_terong/pages/pages.dart';
+import 'package:tame_terong/pages/terong_drop.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -43,8 +44,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Card SecondMenuCard() {
     return Card(
-      color: Color.fromARGB(255, 57, 5, 103),
-      shape: RoundedRectangleBorder(
+      color: const Color.fromARGB(255, 57, 5, 103),
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(5))),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -53,29 +54,32 @@ class _ProfilePageState extends State<ProfilePage> {
           ListTile(
             onTap: () {
               log("Terong drop");
+
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const TerongDrop()));
             },
-            leading: Text(
+            leading: const Text(
               "💦",
               style: TextStyle(fontSize: 20),
             ),
-            title: Text("Terong drop"),
-            subtitle: SingleChildScrollView(
+            title: const Text("Terong drop"),
+            subtitle: const SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Text("Kapan kemunculan jenis terong lain?")),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
           ),
           // kata deve
           ListTile(
             onTap: () {
               log("Kata developernya");
             },
-            leading: Text(
+            leading: const Text(
               "💌",
               style: TextStyle(fontSize: 20),
             ),
-            title: Text("Kata developernya"),
-            subtitle: Text("Jadi gini bang..."),
-            trailing: Icon(Icons.chevron_right),
+            title: const Text("Kata developernya"),
+            subtitle: const Text("Jadi gini bang..."),
+            trailing: const Icon(Icons.chevron_right),
           ),
         ],
       ),
@@ -84,44 +88,38 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Card MenuCard() {
     return Card(
-      color: Color.fromARGB(255, 77, 19, 129),
-      shape: RoundedRectangleBorder(
+      color: const Color.fromARGB(255, 77, 19, 129),
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(5))),
-      child: Padding(
-        padding: EdgeInsets.all(0),
-        // list menu
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // terongku
-            ListTile(
-              onTap: () {
-                log("Terongku");
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // terongku
+          ListTile(
+            onTap: () {
+              log("Terongku");
 
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => TerongkuPage()));
-              },
-              leading: Text(
-                "🍆",
-                style: TextStyle(fontSize: 20),
-              ),
-              title: Text("Terongku"),
-              subtitle: Text("Lihat berapa banyak terongmu"),
-              trailing: Icon(Icons.chevron_right),
-              contentPadding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => const TerongkuPage()));
+            },
+            leading: const Text(
+              "🍆",
+              style: TextStyle(fontSize: 20),
             ),
-            ListTile(
-              onTap: () {
-                log("Berikan terong");
-              },
-              leading: Icon(Icons.upload),
-              title: Text("Berikan terong"),
-              subtitle: Text("Terongin atau diterongin?"),
-              trailing: Icon(Icons.chevron_right),
-              contentPadding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-            ),
-          ],
-        ),
+            title: const Text("Terongku"),
+            subtitle: const Text("Lihat berapa banyak terongmu"),
+            trailing: const Icon(Icons.chevron_right),
+          ),
+          ListTile(
+            onTap: () {
+              log("Berikan terong");
+            },
+            leading: const Icon(Icons.upload),
+            title: const Text("Berikan terong"),
+            subtitle: const Text("Terongin atau diterongin?"),
+            trailing: const Icon(Icons.chevron_right),
+          ),
+        ],
       ),
     );
   }

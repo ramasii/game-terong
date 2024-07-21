@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tame_terong/classes/terong_manager.dart';
 import 'package:tame_terong/classes/terong_v2.dart';
+import 'package:tame_terong/classes/user_clicks.dart';
 import 'package:tame_terong/packages.dart';
 import 'package:tame_terong/pages/profile_page.dart';
 
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TerongManager terongManager = TerongManager();
+  UserClicks userClicks = UserClicks();
 
   // anonym auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -32,7 +34,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     SetupTerong();
-    // _signInAnonymously();
     SetupAnalytics();
   }
 
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> {
 
   Future SetupTerong() async {
     await terongManager.LoadAllTerong();
+    await userClicks.Load();
 
     setState(() {
       log("Setup Terong");
@@ -84,9 +86,9 @@ class _HomePageState extends State<HomePage> {
       onPressed: () {
         // go to akun page
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => ProfilePage()));
+            .push(MaterialPageRoute(builder: (_) => const ProfilePage()));
       },
-      icon: Icon(Icons.person),
+      icon: const Icon(Icons.person),
       tooltip: "Profil",
     );
   }
@@ -100,6 +102,9 @@ class _HomePageState extends State<HomePage> {
           iconSize: 250,
           onPressed: () async {
             TerongV2 terong = terongManager.terongList[0];
+            userClicks.count++;
+            userClicks.Save();
+
             setState(() {
               terong.Add(1);
               terong.Save();
@@ -132,16 +137,19 @@ class _HomePageState extends State<HomePage> {
   CheckThenGetTerong() async {
     // declare
     DateTime dateTime = DateTime.now();
-    TerongV2 terongBiasa = terongManager.terongList[0];
 
     // check V2
+    // cek untuk setiap terong di list
     for (var terong in terongManager.terongList) {
+      // jika bukan terong biasa dan bukan terong yg muncul 24 jam
       if (terong.id != "terong" &&
           terong.timeSpawnEnd != null &&
           terong.timeSpawnStart != null) {
-        if ((dateTime.hour < terong.timeSpawnEnd! ||
+        // jika waktu sekarang di antara kemunculan terong tsb
+        // dan klik pengguna = kelipatannya probabilitas terong
+        if ((dateTime.hour < terong.timeSpawnEnd! &&
                 dateTime.hour >= terong.timeSpawnStart!) &&
-            (terongBiasa.count % terong.probability == 0)) {
+            (userClicks.count % terong.probability == 0)) {
           terong.Add(1);
           terong.Save();
 

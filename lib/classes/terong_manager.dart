@@ -1,8 +1,12 @@
 import 'package:tame_terong/classes/terong_v2.dart';
 
 class TerongManager {
-  static TerongV2 terong =
-      TerongV2(id: "terong", name: "Terong", description: "Sebuah terong", creator: "Anak GT", img: "terong bersih.png");
+  static TerongV2 terong = TerongV2(
+      id: "terong",
+      name: "Terong",
+      description: "Sebuah terong",
+      creator: "Anak GT",
+      img: "terong bersih.png");
 
   static TerongV2 terongPixel = TerongV2(
       id: "terongPixel",
