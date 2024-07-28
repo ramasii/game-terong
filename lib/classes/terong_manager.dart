@@ -18,7 +18,44 @@ class TerongManager {
       timeSpawnEnd: 12,
       probability: 1000);
 
-  List<TerongV2> terongList = [terong, terongPixel];
+  static TerongV2 terongMas = TerongV2(
+    id: "terongMas",
+    name: "Terong Mas",
+    description: "Apakah kamu suka terong? atau suka emas? bagaimana jika Terong Mas?",
+    creator: "Wapa",
+    img: "terong mas.png",
+    timeSpawnEnd: 14,
+    timeSpawnStart: 13,
+    probability: 2000,
+  );
+
+  static TerongV2 terongIblis = TerongV2(
+      id: "terongIblis",
+      name: "Tervil",
+      description: "Jangan di luar rumah kalo sudah Maghrib",
+      creator: "Wapa",
+      img: "iblis terong.png",
+      timeSpawnStart: 0,
+      timeSpawnEnd: 1,
+      probability: 1000);
+
+  static TerongV2 terongMalaikat = TerongV2(
+      id: "terongMalaikat",
+      name: "Terongel",
+      description: "Terong yang terbuat dari cahaya",
+      creator: "Wapa",
+      img: "malaikat terong.png",
+      timeSpawnStart: 6,
+      timeSpawnEnd: 7,
+      probability: 1000);
+
+  List<TerongV2> terongList = [
+    terong,
+    terongPixel,
+    terongMas,
+    terongMalaikat,
+    terongIblis
+  ];
 
   // func
   Future<void> LoadAllTerong() async {
