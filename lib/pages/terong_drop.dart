@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:tame_terong/classes/terong_manager.dart';
 import 'package:tame_terong/classes/terong_v2.dart';
+import 'package:simple_shadow/simple_shadow.dart';
 
 class TerongDrop extends StatefulWidget {
   const TerongDrop({super.key});
@@ -52,18 +53,22 @@ class _TerongDropState extends State<TerongDrop> {
         log("klik terong detail");
         ShowTerongDetail(terong);
       },
-      leading: Image.asset(
-        "assets/images/${terong.img}",
-        // TODO: tambahkan progress indicator ketika gambar belum dimuat
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (frame != null) {
-            return child;
-          } else {
-            return CircularProgressIndicator(
-              color: Colors.indigo,
-            );
-          }
-        },
+      leading: SimpleShadow(
+        sigma: 5,
+        offset: Offset.zero,
+        child: Image.asset(
+          "assets/images/${terong.img}",
+          // TODO: tambahkan progress indicator ketika gambar belum dimuat
+          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+            if (frame != null) {
+              return child;
+            } else {
+              return CircularProgressIndicator(
+                color: Colors.indigo,
+              );
+            }
+          },
+        ),
       ),
       title: Text(terong.name),
       subtitle: Text(terong.timeSpawnStart != null

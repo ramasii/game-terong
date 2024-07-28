@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:tame_terong/classes/classes.dart';
 import 'package:tame_terong/classes/terong_manager.dart';
+import 'package:tame_terong/packages.dart';
 
 class TerongkuPage extends StatefulWidget {
   const TerongkuPage({super.key});
@@ -49,7 +50,10 @@ class _TerongkuPageState extends State<TerongkuPage> {
               onTap: () {
                 log("tap ${terong.name}");
               },
-              leading: Image.asset("assets/images/${terong.img}"),
+              leading: SimpleShadow(
+                  sigma: 5,
+                  offset: Offset.zero,
+                  child: Image.asset("assets/images/${terong.img}")),
               title: Text(terong.name),
               subtitle: Text("By ${terong.creator}"),
               trailing: Container(

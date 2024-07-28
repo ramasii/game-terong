@@ -32,7 +32,7 @@ class TerongManager {
   static TerongV2 terongIblis = TerongV2(
       id: "terongIblis",
       name: "Tervil",
-      description: "Jangan di luar rumah kalo sudah Maghrib",
+      description: "Untuk apa Tervil? Untuk menjaga keseimbangan Terongnesia",
       creator: "Wapa",
       img: "iblis terong.png",
       timeSpawnStart: 0,
